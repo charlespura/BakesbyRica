@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bakes by Rica · artisanal goodies</title>
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #fcf7f2;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: #2f241d;
+      line-height: 1.5;
+      scroll-behavior: smooth;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 1.8rem 2rem 2.5rem;
+    }
+
+    /* --- animated header + scroll effect --- */
+    .navbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0 1.5rem;
+      border-bottom: 2px solid #ecdacb;
+      transition: all 0.3s ease;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: #fcf7f2;
+    }
+    /* subtle shrink + shadow on scroll (will be triggered by js) */
+    .navbar.scrolled {
+      padding: 0.3rem 0 0.8rem;
+      box-shadow: 0 8px 20px rgba(140, 80, 40, 0.08);
+      border-bottom-color: #dbbca5;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: transform 0.25s;
+    }
+    .logo-area:hover {
+      transform: scale(1.02);
+    }
+
+    /* actual logo.jpg (topdesign.jpg) in the header */
+    .logo-image {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 10px rgba(120, 70, 40, 0.15);
+      background: #ebd5c2; /* fallback */
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 2rem;
+      letter-spacing: -0.5px;
+      color: #3b2b1f;
+      line-height: 1.2;
+    }
+
+    .logo-text span {
+      color: #b45f3b;
+      font-weight: 300;
+      margin-left: 0.1rem;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.2rem;
+      font-weight: 500;
+      font-size: 1.1rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #4b392b;
+      transition: 0.2s;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 4px;
+    }
+
+    .nav-links a:hover {
+      border-bottom-color: #b45f3b;
+      color: #b45f3b;
+    }
+
+    .decor-char {
+      font-size: 2rem;
+      color: #ba8b6e;
+      margin-left: 0.5rem;
+      opacity: 0.6;
+    }
+
+    /* --- header image (topdesign.jpg) under navbar --- */
+    .top-banner {
+      margin: 1rem 0 1.5rem;
+      border-radius: 48px;
+      overflow: hidden;
+      max-height: 280px;
+      box-shadow: 0 20px 30px -8px rgba(100, 60, 30, 0.2);
+      transition: transform 0.4s ease, box-shadow 0.4s;
+      border: 3px solid white;
+    }
+    .top-banner:hover {
+      transform: scale(1.01);
+      box-shadow: 0 28px 35px -10px #8b5e42;
+    }
+    .top-banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 7s linear; /* subtle slow zoom on hover */
+    }
+    .top-banner:hover img {
+      transform: scale(1.05);
+    }
+
+    /* page title animation */
+    .page-title {
+      font-size: 2.2rem;
+      font-weight: 600;
+      margin: 2.5rem 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      animation: fadeSlideUp 0.5s ease;
+    }
+    @keyframes fadeSlideUp {
+      0% { opacity: 0; transform: translateY(15px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-title i {
+      color: #b45f3b;
+    }
+
+    /* --- gallery with smooth appear on scroll --- */
+    .gallery-section {
+      margin: 2rem 0 4rem;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+    @media (max-width: 700px) {
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 450px) {
+      .gallery-grid { grid-template-columns: 1fr; }
+    }
+
+    .gallery-item {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      aspect-ratio: 1/1;
+      background: #eddbc9;
+      box-shadow: 0 20px 30px -10px rgba(80, 50, 30, 0.15);
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.2,0.9,0.3,1), box-shadow 0.4s, opacity 0.5s;
+      border: 2px solid white;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .gallery-item.reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .gallery-item:hover {
+      transform: scale(1.02) translateY(-4px);
+      box-shadow: 0 28px 35px -8px rgba(140, 80, 40, 0.25);
+    }
+
+    .gallery-img {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.6s ease;
+    }
+    .gallery-item:hover .gallery-img {
+      transform: scale(1.05);
+    }
+    .img-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.02);
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 1.2rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .gallery-item:hover .img-overlay {
+      opacity: 1;
+    }
+    .zoom-icon {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(4px);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: #b45f3b;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border: 1px solid white;
+    }
+
+    /* LIGHTBOX (full image) */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(20, 12, 8, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .lightbox.show {
+      display: flex;
+      opacity: 1;
+    }
+    .lightbox-content {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 35px 60px rgba(0,0,0,0.5);
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
+      border: 4px solid white;
+      background: #2b1d14;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.show .lightbox-content {
+      transform: scale(1);
+    }
+    .lightbox-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      max-height: 90vh;
+      max-width: 90vw;
+      display: block;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1.5rem; right: 2rem;
+      background: white;
+      border: none;
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #2f1f13;
+      transition: 0.15s;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+      border: 1px solid #f0dccc;
+      z-index: 1000;
+    }
+    .lightbox-close:hover {
+      background: #b45f3b;
+      color: white;
+      transform: rotate(90deg);
+    }
+
+    /* menu cards & content fade up on scroll */
+    .menu-card, .signature-row, .pills-section, .info-panel {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+
+    /* rest of styling (menu etc unchanged but refined) */
+    .menu-card {
+      background: white;
+      border-radius: 40px;
+      padding: 2rem 2.2rem;
+      border: 1px solid #efd9c6;
+      box-shadow: 0 15px 25px rgba(160, 100, 55, 0.05);
+    }
+    .menu-card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .menu-card-header h2 { font-size: 2rem; font-weight: 600; color: #2e2017; }
+    .menu-card-header i { font-size: 2.2rem; color: #b45f3b; }
+    .menu-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .item-block {
+      background: #fefaf6;
+      border-radius: 32px;
+      padding: 1.6rem 1.5rem;
+      border: 1px solid #f5dfcf;
+    }
+    .item-title { font-size: 1.6rem; font-weight: 700; color: #2b1d14; margin-bottom: 0.25rem; }
+    .item-sub { font-size: 1rem; color: #af7c5d; font-weight: 500; margin-bottom: 0.5rem; }
+    .item-desc { color: #5e4636; margin: 0.8rem 0 1rem; border-left: 3px solid #e3c5af; padding-left: 0.8rem; }
+    .price-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.8rem; }
+    .price-tag {
+      background: #f0ddce;
+      padding: 0.5rem 1.4rem;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #3b2a1d;
+      font-size: 0.95rem;
+    }
+    .signature-row {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      background: #edd0bb; border-radius: 80px; padding: 1.2rem 2.8rem; margin: 2.5rem 0;
+    }
+    .est, .made-with { font-size: 1.8rem; font-weight: 500; }
+    .made-with i { color: #b8402b; margin: 0 0.4rem; }
+    .pills-section {
+      background: #fef5ed; border-radius: 70px; padding: 1.8rem 2.5rem; margin: 2.5rem 0; border: 1px solid #e9cfb8;
+    }
+    .pills-title { font-size: 2rem; font-weight: 600; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem; }
+    .pills-title i { color: #b45f3b; }
+    .menu-pills { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .pill {
+      background: white; border: 2px solid #e7cfba; padding: 0.7rem 2rem; border-radius: 60px; font-weight: 600; font-size: 1.1rem; color: #4e3628;
+    }
+    .pill i { margin-right: 0.5rem; color: #b45f3b; }
+    
+    /* ===== NEW MORE INFORMATION PANEL (exactly as requested) ===== */
+    .info-panel {
+      background: white;
+      border-radius: 50px;
+      padding: 2rem 2.5rem;
+      border: 1px solid #f0d5bf;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin: 2.5rem 0 2rem;
+    }
+    .delivery {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #3b2a1d;
+    }
+    .delivery i {
+      color: #b45f3b;
+      margin-right: 0.5rem;
+    }
+    .cater-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem 2.5rem;
+      margin: 1.2rem 0;
+    }
+    .cater-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 1.1rem;
+    }
+    .cater-item i {
+      color: #b45f3b;
+      font-size: 1rem;
+    }
+    .bulk-note {
+      background: #ebd5c2;
+      padding: 0.9rem 2.2rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #2f1f13;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.03);
+    }
+    .bulk-note i {
+      color: #a55328;
+    }
+    /* override for left column */
+    .left-col p {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #5e3a28;
+    }
+    .left-col strong {
+      font-size: 1.2rem;
+      color: #2b1a0f;
+    }
+
+    /* social footer with working links (real ig/fb/mail) */
+    .social-footer {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-top: 4rem; padding: 2rem 0 1rem; border-top: 2px solid #e9d5c2;
+    }
+    .social-item {
+      display: flex; align-items: center; gap: 0.6rem; font-size: 1.1rem; background: #fffaf5; padding: 0.5rem 1.8rem; border-radius: 60px; border: 1px solid #decbb8;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .social-item a {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .social-item:hover {
+      transform: translateY(-4px);
+      background: #fae9dd;
+    }
+    .fa-facebook { color: #3b5998; }
+    .fa-instagram { color: #c13584; }
+    .fa-envelope { color: #b45f3b; }
+    .fa-facebook-messenger { color: #0078FF; } 
+    /* copyright */
+    .copyright {
+      text-align:center; margin:1.5rem 0 0; color:#866853;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- navigation (with actual logo image) -->
+  <div class="navbar" id="navbar">
+    <div class="logo-area">
+      <!-- logo.jpg (also used as logo in top) -->
+      <img src="/pictures/logo.jpg" alt="Bakes by Rica logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="logo-text">Bakes <span>by Rica</span></div>
+    </div>
+    <div class="nav-links">
+      <a href="#">Menu</a>
+      <a href="#">Category</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+      <span class="decor-char">✦</span>
+    </div>
+  </div>
+
+  <!-- header image: topdesign.jpg (full width under nav) -->
+  <div class="top-banner">
+    <img src="/pictures/topdesign.jpg" alt="Artisan treats" onerror="this.style.display='none'; this.parentElement.style.background='#edd0bb'; this.parentElement.style.padding='3rem'; this.parentElement.innerHTML='<span style=\'color:#5e3a28;\'>✨ topdesign.jpg ✨</span>'">
+  </div>
+
+  <!-- page title -->
+  <div class="page-title">
+    <i class="fas fa-sparkles"></i> artisanal treats · fresh from Laguna
+  </div>
+
+  <!-- gallery section (full images 1.jpg 2.jpg 3.jpg) -->
+  <div class="gallery-section">
+    <div class="gallery-grid">
+      <div class="gallery-item" data-src="/pictures/1.jpg"><div class="gallery-img" style="background-image: url('/pictures/1.jpg');"></div><div class="img-overlay"><span class="zoom-icon"><i class="fas fa-search-plus"></i></span></div></div>
+      <div class="gallery-item" data-src="/pictures/2.jpg"><div class="gallery-img" style="background-image: url('/pictures/2.jpg');"></div><div class="img-overlay"><span class="zoom-icon"><i class="fas fa-search-plus"></i></span></div></div>
+      <div class="gallery-item" data-src="/pictures/3.jpg"><div class="gallery-img" style="background-image: url('/pictures/3.jpg');"></div><div class="img-overlay"><span class="zoom-icon"><i class="fas fa-search-plus"></i></span></div></div>
+    </div>
+  </div>
+
+  <!-- menu section unchanged from your design -->
+  <div class="menu-section">
+    <div class="menu-card"><div class="menu-card-header"><i class="fas fa-cake"></i><h2>CAKES</h2></div><div class="menu-items"><div class="item-block"><div class="item-title">RED VELVET CAKE</div><div class="item-sub">Seasonal Cake</div><div class="item-desc">A classic favorite with a soft, velvety crumb and rich cocoa flavor.</div><div class="price-row"><span class="price-tag">₱185 10cm slice</span><span class="price-tag">₱279 300ml pan</span></div></div><div class="item-block"><div class="item-title">CHOCOLATE CAKE</div><div class="item-sub">Seasonal Cake</div><div class="item-desc">Deep chocolate flavor, super moist texture.</div><div class="price-row"><span class="price-tag">₱220 300ml pan</span><span class="price-tag">₱390 600ml pan</span></div></div></div></div>
+    <div class="menu-card"><div class="menu-card-header"><i class="fas fa-muffin"></i><h2>MUFFINS</h2></div><div class="menu-items"><div class="item-block"><div class="item-title">CHEESE MUFFIN</div><div class="item-desc">Moist and fluffy with rich cheesy flavor.</div><span class="price-tag">₱190 Muffin Share (4pcs)</span></div><div class="item-block"><div class="item-title">DOUBLE CHOCOLATE BANANA MUFFIN</div><div class="item-desc">Soft banana & chocolate.</div><div class="price-row"><span class="price-tag">₱150 Share (4pcs)</span><span class="price-tag">₱225 Sulit (6pcs)</span></div></div></div></div>
+    <div class="menu-card"><div class="menu-card-header"><i class="fas fa-cookie-bite"></i><h2>BITES & COOKIES</h2></div><div class="menu-items"><div class="item-block"><div class="item-title">FUDGY BROWNIE BITES</div><div class="item-sub">Crowd's Favorite</div><div class="item-desc">Ultra-fudgy, soft center, crackly top.</div><div style="display:flex; flex-wrap:wrap; gap:0.4rem;"><span class="price-tag">₱70 fix (4pcs)</span><span class="price-tag">₱105 bite (6pcs)</span><span class="price-tag">₱210 share (12pcs)</span><span class="price-tag">₱310 sulit (18pcs)</span></div></div><div class="item-block"><div class="item-title">CHOCOLATE CHIP COOKIES</div><div class="item-desc">Soft-baked, crisp edges, chewy middle.</div><div class="price-row"><span class="price-tag">₱55 (1pc)</span><span class="price-tag">₱165 (3pcs)</span></div></div></div></div>
+  </div>
+
+  <!-- signature row -->
+  <div class="signature-row"><div class="est">EST. 2025</div><div class="made-with"><i class="fas fa-heart"></i> MADE WITH LOVE</div><div class="est">me made goodies <i class="fas fa-cookie"></i></div></div>
+
+  <!-- flour pills -->
+  <div class="pills-section"><div class="pills-title"><i class="fas fa-bowl-food"></i> Flour & Feeds</div><div class="menu-pills"><span class="pill"><i class="fas fa-cheese"></i> CHEESE MUFFIN</span><span class="pill"><i class="fas fa-mug-hot"></i> COFFEE EX</span><span class="pill"><i class="fas fa-crown"></i> BAKESPY</span><span class="pill"><i class="fas fa-candy-cane"></i> 2 more treats</span></div></div>
+
+  <!-- ===== MORE INFORMATION (exactly as requested) ===== -->
+  <div class="info-panel">
+    <div class="left-col">
+      <div class="delivery"><i class="fas fa-truck"></i> Delivery & Pick-up Available</div>
+      <p style="font-weight:600; margin:1.2rem 0 0.5rem;">WE ALSO CATER FOR:</p>
+      <div class="cater-list">
+        <span class="cater-item"><i class="fas fa-check-circle"></i> Suppliers & Resellers</span>
+        <span class="cater-item"><i class="fas fa-check-circle"></i> Party Celebrations</span>
+        <span class="cater-item"><i class="fas fa-check-circle"></i> Events & Bulk Orders</span>
+        <span class="cater-item"><i class="fas fa-check-circle"></i> Brand Partnerships</span>
+      </div>
+    </div>
+    <div class="bulk-note">
+      <i class="fas fa-tags"></i> Discounted prices available for bulk & partner orders
+    </div>
+  </div>
+
+  <!-- social footer with working links (fb, ig, gmail, messenger) -->
+  <div class="social-footer">
+    <div class="social-item"><a href="https://web.facebook.com/profile.php?id=61578162763563" target="_blank" rel="noopener"><i class="fab fa-facebook"></i> BakesbyRica</a></div>
+    <div class="social-item"><a href="https://instagram.com/bakesbyrica" target="_blank" rel="noopener"><i class="fab fa-instagram"></i> bakesbyrica</a></div>
+    <div class="social-item"><a href="mailto:buildwithrica.s@gmail.com"><i class="fas fa-envelope"></i> buildwithrica.s</a></div>
+    <div class="social-item"><a href="https://m.me/61578162763563" target="_blank" rel="noopener"><i class="fab fa-facebook-messenger"></i> messenger</a></div>
+  </div>
+  <div class="copyright">© Bakes by Rica · homemade with love in Laguna</div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightbox-close"><i class="fas fa-times"></i></button>
+  <div class="lightbox-content">
+    <img class="lightbox-img" id="lightbox-img" src="" alt="enlarged treat">
+  </div>
+</div>
+
+<script>
+  (function() {
+    // navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 30) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // lightbox logic (full image)
+    const items = document.querySelectorAll('.gallery-item');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('lightbox-close');
+
+    items.forEach(item => {
+      item.addEventListener('click', function() {
+        let src = this.dataset.src || '';
+        if (!src) {
+          const bgStyle = this.querySelector('.gallery-img')?.style.backgroundImage;
+          if (bgStyle && bgStyle !== 'none') {
+            const match = bgStyle.match(/url\(["']?([^"')]+)["']?\)/);
+            if (match && match[1]) src = match[1];
+          }
+        }
+        if (src) {
+          lightboxImg.src = src;
+          lightbox.classList.add('show');
+        }
+      });
+    });
+
+    const closeLightbox = () => {
+      lightbox.classList.remove('show');
+      lightboxImg.src = '';
+    };
+    closeBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lightbox.classList.contains('show')) closeLightbox(); });
+
+    // reveal animations on scroll (intersection observer)
+    const revealElements = document.querySelectorAll('.gallery-item, .menu-card, .signature-row, .pills-section, .info-panel');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal');
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '20px' });
+    revealElements.forEach(el => observer.observe(el));
+
+    // also force check after small delay
+    setTimeout(() => {
+      window.dispatchEvent(new Event('scroll'));
+    }, 200);
+  })();
+</script>
+<!-- all paths preserved: logo.jpg, topdesign.jpg, 1.jpg,2.jpg,3.jpg — if images missing fallback style -->
+</body>
+</html>
